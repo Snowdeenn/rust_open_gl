@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-winit = "0.29"
-glutin = "0.31"
+winit = "0.30"
+glutin = "0.32"
 glow = "0.13"
-raw-window-handle = "0.6"
+glutin-winit = "0.5"
