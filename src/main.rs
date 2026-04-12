@@ -115,10 +115,10 @@ fn main() {
         gl.bind_vertex_array(Some(vao));
         gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
 
-        let vertices: [f32; 9] = [
-            -0.5, -0.5, 0.0,
-            0.5, -0.5, 0.0,
-            0.0, 0.5, 0.0
+        let vertices: [f32; 18] = [
+            -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
+            0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
+            0.0, 0.5, 0.0, 0.0, 0.0, 1.0,
         ];
 
         // -------- Remplissage du VBO --------
@@ -128,45 +128,47 @@ fn main() {
         gl.buffer_data_u8_slice(glow::ARRAY_BUFFER, from_raw_parts(vertice_ptr, vertice_size), glow::STATIC_DRAW);
     
         // -------- Description pour le vao --------
-        let stride: i32 = 3 * size_of::<f32>() as i32;
-        let offset: i32 = 0; // Car on a que la position en attribut
+        let stride: i32 = 6 * size_of::<f32>() as i32;
+        let offset: i32 = 3 * size_of::<f32>() as i32; 
 
-        gl.vertex_attrib_pointer_f32(0, 3, glow::FLOAT, false, stride, offset);
+        gl.vertex_attrib_pointer_f32(0, 3, glow::FLOAT, false, stride, 0);
+        gl.vertex_attrib_pointer_f32(1, 3, glow::FLOAT, false, stride, offset);
         gl.enable_vertex_attrib_array(0);
+        gl.enable_vertex_attrib_array(1);
 
         gl.bind_vertex_array(None);
         gl.bind_buffer(glow::ARRAY_BUFFER, None);
 
         event_loop.run(move |event: Event<()>, window_target:&winit::event_loop::ActiveEventLoop| {
-        window_target.set_control_flow(ControlFlow::Poll);
-        match event {
+            window_target.set_control_flow(ControlFlow::Poll);
+            match event {
 
-            Event::WindowEvent {event, .. } => {
+                Event::WindowEvent {event, .. } => {
 
-                match event {
-                    WindowEvent::CloseRequested => window_target.exit(),
-                    WindowEvent::RedrawRequested => {
-                        let current_time: f32 = time.elapsed().as_secs_f32();
+                    match event {
+                        WindowEvent::CloseRequested => window_target.exit(),
+                        WindowEvent::RedrawRequested => {
+                            let current_time: f32 = time.elapsed().as_secs_f32();
 
-                        let r: f32 = (current_time.sin() + 1.0) / 2.0;
-                        let g: f32 = (current_time.cos() + 1.0) / 2.0;
-                        let b: f32 = (current_time.sin() + 1.0) / 2.0;
+                            let r: f32 = (current_time.sin() + 1.0) / 2.0;
+                            let g: f32 = (current_time.cos() + 1.0) / 2.0;
+                            let b: f32 = (current_time.sin() + 1.0) / 2.0;
 
-                        gl.clear_color(r, g, b, 1.0);
-                        gl.clear(glow::COLOR_BUFFER_BIT);
-                        gl.use_program(Some(program));
-                        gl.bind_vertex_array(Some(vao));
-                        gl.draw_arrays(glow::TRIANGLES, 0, 3);
+                            gl.clear_color(r, g, b, 1.0);
+                            gl.clear(glow::COLOR_BUFFER_BIT);
+                            gl.use_program(Some(program));
+                            gl.bind_vertex_array(Some(vao));
+                            gl.draw_arrays(glow::TRIANGLES, 0, 3);
 
-                        gl_surface.swap_buffers(&gl_context).unwrap();
-                        
-                    },
-                    _ => ()
-                }
-            },
-            _ => window.request_redraw(),
-        }
-    }).unwrap();
+                            gl_surface.swap_buffers(&gl_context).unwrap();
+                            
+                        },
+                        _ => ()
+                    }
+                },
+                _ => window.request_redraw(),
+            }
+        }).unwrap();
     };
     
 }
