@@ -16,6 +16,10 @@ use core::f32;
 use std::time::Instant;
 use std::mem::size_of;
 use std::slice::{from_raw_parts};
+
+mod math;
+use crate::math::_mat4_::Mat4;
+use crate::math::_vec3_::Vec3;
 fn main() {
     let event_loop: EventLoop<()> = EventLoop::new().unwrap();
     
@@ -102,42 +106,91 @@ fn main() {
             panic!("[Program] Erreur : {}", gl.get_program_info_log(program));
         }
 
+    
+        // -------- Construction des matrices --------
+        let view: Mat4 = Mat4::look_at(Vec3{x: 0.0,y: 0.0,z: 3.0}, Vec3{x: 0.0,y: 0.0,z: 0.0}, Vec3{x: 0.0,y: 1.0,z: 0.0});
+        let perspective: Mat4 = Mat4::perspective(45.0_f32.to_radians(), 800.0 / 600.0, 0.1, 100.0);
+
+        // --------- Localisation des matrices dans le vertex shader --------
+        let loctaion_model: glow::NativeUniformLocation = gl.get_uniform_location(program, "uModel").unwrap();
+        let location_view: glow::NativeUniformLocation = gl.get_uniform_location(program, "uView").unwrap();
+        let location_proj: glow::NativeUniformLocation = gl.get_uniform_location(program, "uProjection").unwrap();
+
+
         // -------- Netoyage --------
-        gl.detach_shader(program, vertex_shader);
-        gl.detach_shader(program, frag_shader);
-        gl.delete_shader(vertex_shader);
-        gl.delete_shader(frag_shader);
+        {
+            gl.detach_shader(program, vertex_shader);
+            gl.detach_shader(program, frag_shader);
+            gl.delete_shader(vertex_shader);
+            gl.delete_shader(frag_shader);
+        }
 
         // -------- Mise en place VAO et VBO --------
         let vao: glow::NativeVertexArray = gl.create_vertex_array().unwrap();
         let vbo: glow::NativeBuffer = gl.create_buffer().unwrap();
+        let ebo:glow::NativeBuffer = gl.create_buffer().unwrap();
+        {
+            gl.bind_vertex_array(Some(vao));
+            gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
+            gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, Some(ebo));
 
-        gl.bind_vertex_array(Some(vao));
-        gl.bind_buffer(glow::ARRAY_BUFFER, Some(vbo));
+            let vertices: [f32; 48] = [
+                -0.5, -0.5, 0.5, 1.0, 0.0, 0.0, //0
+                0.5, -0.5, 0.5, 0.0, 1.0, 0.0,  //1
+                -0.5, 0.5, 0.5, 0.0, 0.0, 1.0,  //2
+                0.5, 0.5, 0.5, 0.0, 1.0, 0.0,   //3
+                -0.5, -0.5, -0.5, 1.0, 0.0, 0.0,//4
+                0.5, -0.5, -0.5, 0.0, 1.0, 0.0, //5
+                -0.5, 0.5, -0.5, 0.0, 0.0, 1.0, //6
+                0.5, 0.5, -0.5, 0.0, 1.0, 0.0,  //7
+            ];
 
-        let vertices: [f32; 18] = [
-            -0.5, -0.5, 0.0, 1.0, 0.0, 0.0,
-            0.5, -0.5, 0.0, 0.0, 1.0, 0.0,
-            0.0, 0.5, 0.0, 0.0, 0.0, 1.0,
-        ];
+            let index: [u32; 36] = [
+                // face avant
+                0, 1, 2,
+                1, 3, 2,
+                //face droite
+                1, 5, 7,
+                1, 3, 7,
+                //face gauche
+                0, 2, 6,
+                0, 4, 6,
+                //face arrière
+                4, 5, 6,
+                5, 7, 6,
+                //face bas
+                0, 4, 1,
+                4, 5, 1,
+                //face haut
+                2, 3, 6,
+                3, 6, 7
+            ];
 
-        // -------- Remplissage du VBO --------
-        let vertice_ptr: *const u8 = &vertices as *const f32 as *const u8;
-        let vertice_size = vertices.len() * size_of::<f32>();
+            // -------- Remplissage du VBO --------
+            let vertice_ptr: *const u8 = &vertices as *const f32 as *const u8;
+            let vertice_size = vertices.len() * size_of::<f32>();
 
-        gl.buffer_data_u8_slice(glow::ARRAY_BUFFER, from_raw_parts(vertice_ptr, vertice_size), glow::STATIC_DRAW);
-    
-        // -------- Description pour le vao --------
-        let stride: i32 = 6 * size_of::<f32>() as i32;
-        let offset: i32 = 3 * size_of::<f32>() as i32; 
+            gl.buffer_data_u8_slice(glow::ARRAY_BUFFER, from_raw_parts(vertice_ptr, vertice_size), glow::STATIC_DRAW);
+        
+            // -------- Remplissage de l'EBO --------
+            let index_ptr: *const u8 = &index  as *const u32 as *const u8;
+            let index_size = index.len() * size_of::<u32>();
 
-        gl.vertex_attrib_pointer_f32(0, 3, glow::FLOAT, false, stride, 0);
-        gl.vertex_attrib_pointer_f32(1, 3, glow::FLOAT, false, stride, offset);
-        gl.enable_vertex_attrib_array(0);
-        gl.enable_vertex_attrib_array(1);
+            gl.buffer_data_u8_slice(glow::ELEMENT_ARRAY_BUFFER, from_raw_parts(index_ptr, index_size), glow::STATIC_DRAW);
 
-        gl.bind_vertex_array(None);
-        gl.bind_buffer(glow::ARRAY_BUFFER, None);
+            // -------- Description pour le vao --------
+            let stride: i32 = 6 * size_of::<f32>() as i32;
+            let offset: i32 = 3 * size_of::<f32>() as i32; 
+
+            gl.vertex_attrib_pointer_f32(0, 3, glow::FLOAT, false, stride, 0);
+            gl.vertex_attrib_pointer_f32(1, 3, glow::FLOAT, false, stride, offset);
+            gl.enable_vertex_attrib_array(0);
+            gl.enable_vertex_attrib_array(1);
+
+            gl.bind_vertex_array(None);
+            gl.bind_buffer(glow::ARRAY_BUFFER, None);
+            gl.bind_buffer(glow::ELEMENT_ARRAY_BUFFER, None);
+        }
 
         event_loop.run(move |event: Event<()>, window_target:&winit::event_loop::ActiveEventLoop| {
             window_target.set_control_flow(ControlFlow::Poll);
@@ -150,15 +203,21 @@ fn main() {
                         WindowEvent::RedrawRequested => {
                             let current_time: f32 = time.elapsed().as_secs_f32();
 
-                            let r: f32 = (current_time.sin() + 1.0) / 2.0;
-                            let g: f32 = (current_time.cos() + 1.0) / 2.0;
-                            let b: f32 = (current_time.sin() + 1.0) / 2.0;
-
-                            gl.clear_color(r, g, b, 1.0);
+                            gl.clear_color(0.0, 0.0, 0.0, 1.0);
                             gl.clear(glow::COLOR_BUFFER_BIT);
                             gl.use_program(Some(program));
+
+                            let model: Mat4 = Mat4::rotation_y(current_time * 0.5)
+                                    .multiply(Mat4::rotation_x(current_time))
+                                    .multiply(Mat4::rotation_z(current_time * 0.25));
+                
+                            // -------- Envoie des valeurs au GPU --------
+                            gl.uniform_matrix_4_f32_slice(Some(&loctaion_model), false, &model.columns);
+                            gl.uniform_matrix_4_f32_slice(Some(&location_view), false, &view.columns);
+                            gl.uniform_matrix_4_f32_slice(Some(&location_proj), false, &perspective.columns);
+    
                             gl.bind_vertex_array(Some(vao));
-                            gl.draw_arrays(glow::TRIANGLES, 0, 3);
+                            gl.draw_elements(glow::TRIANGLES, 36, glow::UNSIGNED_INT, 0);
 
                             gl_surface.swap_buffers(&gl_context).unwrap();
                             
