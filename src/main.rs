@@ -106,45 +106,46 @@ fn main() {
 
         //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
         // (-0.5, 0.5, 0.5) -> Position du point (x, y, z)
+        // (1.0, 0.0, 0.0) -> Normale de la face
         // (1.0, 0.0, 0.0) -> Couleur du point (RGB)
         // (0.0) -> uv du point
         //=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=+=
-        let vertices: [f32; 192] = [
+        let vertices: [f32; 264] = [
             // Face avant (z = +0.5)
-            -0.5, -0.5,  0.5,  1.0, 0.0, 0.0,  0.0, 0.0,
-            0.5, -0.5,  0.5,  1.0, 0.0, 0.0,  1.0, 0.0,
-            0.5,  0.5,  0.5,  1.0, 0.0, 0.0,  1.0, 1.0,
-            -0.5,  0.5,  0.5,  1.0, 0.0, 0.0,  0.0, 1.0,
+            -0.5, -0.5,  0.5,  0.0, 0.0, 1.0,   1.0, 0.0, 0.0,  0.0, 0.0,
+            0.5, -0.5,  0.5,   0.0, 0.0, 1.0,  1.0, 0.0, 0.0,  1.0, 0.0,
+            0.5,  0.5,  0.5,   0.0, 0.0, 1.0,  1.0, 0.0, 0.0,  1.0, 1.0,
+            -0.5,  0.5,  0.5,  0.0, 0.0, 1.0,   1.0, 0.0, 0.0,  0.0, 1.0,
 
             // Face arrière (z = -0.5)
-            0.5, -0.5, -0.5,  0.0, 1.0, 0.0,  0.0, 0.0,
-            -0.5, -0.5, -0.5,  0.0, 1.0, 0.0,  1.0, 0.0,
-            -0.5,  0.5, -0.5,  0.0, 1.0, 0.0,  1.0, 1.0,
-            0.5,  0.5, -0.5,  0.0, 1.0, 0.0,  0.0, 1.0,
+            0.5, -0.5, -0.5,  0.0, 0.0, -1.0,  0.0, 1.0, 0.0,  0.0, 0.0,
+            -0.5, -0.5, -0.5, 0.0, 0.0, -1.0,   0.0, 1.0, 0.0,  1.0, 0.0,
+            -0.5,  0.5, -0.5, 0.0, 0.0, -1.0,   0.0, 1.0, 0.0,  1.0, 1.0,
+            0.5,  0.5, -0.5,  0.0, 0.0, -1.0,  0.0, 1.0, 0.0,  0.0, 1.0,
 
             // Face droite (x = +0.5)
-            0.5, -0.5,  0.5,  0.0, 0.0, 1.0,  0.0, 0.0,
-            0.5, -0.5, -0.5,  0.0, 0.0, 1.0,  1.0, 0.0,
-            0.5,  0.5, -0.5,  0.0, 0.0, 1.0,  1.0, 1.0,
-            0.5,  0.5,  0.5,  0.0, 0.0, 1.0,  0.0, 1.0,
+            0.5, -0.5,  0.5,  1.0, 0.0, 0.0,  0.0, 0.0, 1.0,  0.0, 0.0,
+            0.5, -0.5, -0.5,  1.0, 0.0, 0.0,  0.0, 0.0, 1.0,  1.0, 0.0,
+            0.5,  0.5, -0.5,  1.0, 0.0, 0.0,  0.0, 0.0, 1.0,  1.0, 1.0,
+            0.5,  0.5,  0.5,  1.0, 0.0, 0.0,  0.0, 0.0, 1.0,  0.0, 1.0,
 
             // Face gauche (x = -0.5)
-            -0.5, -0.5, -0.5,  1.0, 1.0, 0.0,  0.0, 0.0,
-            -0.5, -0.5,  0.5,  1.0, 1.0, 0.0,  1.0, 0.0,
-            -0.5,  0.5,  0.5,  1.0, 1.0, 0.0,  1.0, 1.0,
-            -0.5,  0.5, -0.5,  1.0, 1.0, 0.0,  0.0, 1.0,
+            -0.5, -0.5, -0.5,  -1.0, 0.0, 0.0,  1.0, 1.0, 0.0,  0.0, 0.0,
+            -0.5, -0.5,  0.5,  -1.0, 0.0, 0.0,  1.0, 1.0, 0.0,  1.0, 0.0,
+            -0.5,  0.5,  0.5,  -1.0, 0.0, 0.0,  1.0, 1.0, 0.0,  1.0, 1.0,
+            -0.5,  0.5, -0.5,  -1.0, 0.0, 0.0,  1.0, 1.0, 0.0,  0.0, 1.0,
 
             // Face haut (y = +0.5)
-            -0.5,  0.5,  0.5,  1.0, 0.0, 1.0,  0.0, 0.0,
-            0.5,  0.5,  0.5,  1.0, 0.0, 1.0,  1.0, 0.0,
-            0.5,  0.5, -0.5,  1.0, 0.0, 1.0,  1.0, 1.0,
-            -0.5,  0.5, -0.5,  1.0, 0.0, 1.0,  0.0, 1.0,
+            -0.5,  0.5,  0.5, 0.0, 1.0, 0.0,   1.0, 0.0, 1.0,  0.0, 0.0,
+            0.5,  0.5,  0.5,  0.0, 1.0, 0.0,  1.0, 0.0, 1.0,  1.0, 0.0,
+            0.5,  0.5, -0.5,  0.0, 1.0, 0.0,  1.0, 0.0, 1.0,  1.0, 1.0,
+            -0.5,  0.5, -0.5, 0.0, 1.0, 0.0,   1.0, 0.0, 1.0,  0.0, 1.0,
 
             // Face bas (y = -0.5)
-            -0.5, -0.5, -0.5,  0.0, 1.0, 1.0,  0.0, 0.0,
-            0.5, -0.5, -0.5,  0.0, 1.0, 1.0,  1.0, 0.0,
-            0.5, -0.5,  0.5,  0.0, 1.0, 1.0,  1.0, 1.0,
-            -0.5, -0.5,  0.5,  0.0, 1.0, 1.0,  0.0, 1.0,
+            -0.5, -0.5, -0.5, 0.0, -1.0, 0.0,   0.0, 1.0, 1.0,  0.0, 0.0,
+            0.5, -0.5, -0.5,  0.0, -1.0, 0.0,  0.0, 1.0, 1.0,  1.0, 0.0,
+            0.5, -0.5,  0.5,  0.0, -1.0, 0.0,  0.0, 1.0, 1.0,  1.0, 1.0,
+            -0.5, -0.5,  0.5, 0.0, -1.0, 0.0,   0.0, 1.0, 1.0,  0.0, 1.0,
         ];
 
         let index: [u32; 36] = [
@@ -156,11 +157,17 @@ fn main() {
             20, 21, 22,  20, 22, 23,  // bas
         ];
 
-        let attribs: [VertexAttrib; 3] = [
-            VertexAttrib {index: 0, size: 3, offset: 0, stride: 8 * size_of::<f32>() as i32},
-            VertexAttrib {index: 1, size: 3, offset: 3 * size_of::<f32>() as i32, stride: 8 * size_of::<f32>() as i32},
-            VertexAttrib {index: 2, size: 2, offset: 6 * size_of::<f32>() as i32, stride: 8 * size_of::<f32>() as i32}
-        ]; 
+        let stride: i32 = 11 * size_of::<f32>() as i32;
+        let mut attribs: Vec<VertexAttrib> = Vec::new();
+            // -- Position --
+            attribs.push(VertexAttrib {index: 0, size: 3, offset: 0, stride: stride});
+            // -- Normale --
+            attribs.push(VertexAttrib { index: 1, size: 3, offset: 3 * size_of::<f32>() as i32, stride: stride });
+            // -- Couleur --
+            attribs.push(VertexAttrib {index: 2, size: 3, offset: 6 * size_of::<f32>() as i32, stride: stride});
+            // -- UV --
+            attribs.push(VertexAttrib {index: 3, size: 2, offset: 9 * size_of::<f32>() as i32, stride: stride});
+        
         
         let mesh: Mesh = Mesh::new(&gl, &vertices, &index, &attribs);
 
@@ -173,8 +180,20 @@ fn main() {
         gl.enable(glow::DEPTH_TEST);
         
         gl.use_program(Some(program));
+        // Envoie des Texture
         gl.uniform_1_i32(Some(&location_u_texture), 0);
         gl.uniform_1_i32(Some(&location_u_texture_2), 1);
+
+        // Envoie de la couleur lumière 
+        let location_light: glow::NativeUniformLocation = gl.get_uniform_location(program, "uLightColor").unwrap();
+        gl.uniform_3_f32(Some(&location_light), 1.0, 1.0, 1.0);
+        // Envoie de la position de la lumière
+        let location_light_pos: glow::NativeUniformLocation = gl.get_uniform_location(program, "uLightPos").unwrap();
+        gl.uniform_3_f32(Some(&location_light_pos), 2.0, 2.0, 2.0);
+
+        //Envoie de la position de la camera
+        let location_cam_pos: glow::NativeUniformLocation = gl.get_uniform_location(program, "uCamPos").unwrap();
+        gl.uniform_3_f32(Some(&location_cam_pos), 0.0, 0.0, 3.0);
     
         event_loop.run(move |event: Event<()>, window_target:&winit::event_loop::ActiveEventLoop| {
             window_target.set_control_flow(ControlFlow::Poll);
