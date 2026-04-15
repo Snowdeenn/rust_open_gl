@@ -15,7 +15,6 @@ use glutin_winit::{DisplayBuilder, GlWindow};
 use core::f32;
 use std::time::Instant;
 use std::mem::{size_of};
-use std::slice::{from_raw_parts};
 
 mod math;
 use crate::math::_mat4_::Mat4;
@@ -29,7 +28,6 @@ use crate::shader::create_program;
 use crate::mesh::{Mesh, VertexAttrib};
 use crate::texture::load_texture;
 
-use image::DynamicImage;
 
 fn main() {
     let event_loop: EventLoop<()> = EventLoop::new().unwrap();

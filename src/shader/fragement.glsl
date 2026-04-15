@@ -20,7 +20,7 @@ void main(){
 
     vec3 viewDirection  = normalize(uCamPos - vFragPos);
     vec3 reflectDir     = reflect(-lightDirection, vNormal);
-    float spec           = pow(max(dot(viewDirection, reflectDir), 0.0), 8.0);
+    float spec          = pow(max(dot(viewDirection, reflectDir), 0.0), 8.0);
     vec3 speculaire     = spec * uLightColor;
 
     vec3 ambient = 0.6 * uLightColor;
